@@ -3,7 +3,7 @@ DB_CONFIG = {
     'host': 'localhost',
     'port': 3306,
     'user': 'aventura_user',
-    'password': 'Aventura2024!',
+    'password': 'Aventura1234',
     'database': 'Aventura',
     'charset': 'utf8mb4'
 }
