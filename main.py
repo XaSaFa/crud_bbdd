@@ -7,7 +7,7 @@ import database as db
 
 app = FastAPI(title="Aventura CRUD")
 
-# Configurar templates y archivos estáticos
+# Configurar templates i arxius estàtics
 templates = Jinja2Templates(directory="templates")
 app.mount("/static", StaticFiles(directory="static"), name="static")
 
