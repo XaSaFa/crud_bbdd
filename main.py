@@ -16,7 +16,6 @@ app.mount("/static", StaticFiles(directory="static"), name="static")
 
 @app.get("/", response_class=HTMLResponse)
 async def index(request: Request):
-    """Página principal con menú"""
     return templates.TemplateResponse("index.html", {"request": request})
 
 
@@ -24,10 +23,10 @@ async def index(request: Request):
 
 @app.get("/localitzacions", response_class=HTMLResponse)
 async def list_localitzacions(request: Request):
-    """Lista todas las localizaciones"""
+    """Mostra totes les localitzacions"""
     localitzacions = db.execute_query("SELECT * FROM localitzacions ORDER BY id")
     
-    # Decodificar el campo blob descripcio de bytes a string
+    # Decodificar el camp blob descripcio de bytes a string
     for loc in localitzacions:
         if loc.get('descripcio') and isinstance(loc['descripcio'], bytes):
             try:
@@ -42,7 +41,7 @@ async def list_localitzacions(request: Request):
 
 @app.get("/localitzacions/nova", response_class=HTMLResponse)
 async def nova_localitzacio_form(request: Request):
-    """Formulario para crear nueva localización"""
+    """Formulari per crear nova localització"""
     return templates.TemplateResponse("localitzacio_form.html", {"request": request})
 
 @app.post("/localitzacions/nova")
@@ -51,22 +50,22 @@ async def crear_localitzacio(
     descripcio: str = Form(""),
     imatge: str = Form("")
 ):
-    """Crea una nueva localización"""
+    """Crea una nova localització"""
     query = """
         INSERT INTO localitzacions (nom, descripcio, imatge) 
         VALUES (%s, %s, %s)
     """
-    # Convertir descripcio a bytes UTF-8 para el campo blob
+    # Convertir descripció a bytes UTF-8 pel camp blob
     descripcio_bytes = descripcio.encode('utf-8') if descripcio else b''
     db.execute_query(query, (nom, descripcio_bytes, imatge), fetch=False)
     return RedirectResponse(url="/localitzacions", status_code=status.HTTP_303_SEE_OTHER)
 
 @app.get("/localitzacions/{id}/editar", response_class=HTMLResponse)
 async def editar_localitzacio_form(request: Request, id: int):
-    """Formulario para editar localización"""
+    """Formulari per editar localització"""
     localitzacio = db.execute_single("SELECT * FROM localitzacions WHERE id = %s", (id,))
     
-    # Decodificar el campo blob descripcio
+    # Decodificar el camp blob descripció
     if localitzacio and localitzacio.get('descripcio') and isinstance(localitzacio['descripcio'], bytes):
         try:
             localitzacio['descripcio'] = localitzacio['descripcio'].decode('utf-8')
@@ -85,20 +84,20 @@ async def actualitzar_localitzacio(
     descripcio: str = Form(""),
     imatge: str = Form("")
 ):
-    """Actualiza una localización"""
+    """Actualitza una localització"""
     query = """
         UPDATE localitzacions 
         SET nom = %s, descripcio = %s, imatge = %s 
         WHERE id = %s
     """
-    # Convertir descripcio a bytes UTF-8 para el campo blob
+    # Convertir descripció a bytes UTF-8 pel camp blob
     descripcio_bytes = descripcio.encode('utf-8') if descripcio else b''
     db.execute_query(query, (nom, descripcio_bytes, imatge, id), fetch=False)
     return RedirectResponse(url="/localitzacions", status_code=status.HTTP_303_SEE_OTHER)
 
 @app.post("/localitzacions/{id}/eliminar")
 async def eliminar_localitzacio(id: int):
-    """Elimina una localización"""
+    """Elimina una localització"""
     # Verificar si hay camins usando esta localización
     check_query = """
         SELECT COUNT(*) as count FROM camins 
@@ -107,8 +106,7 @@ async def eliminar_localitzacio(id: int):
     result = db.execute_single(check_query, (id, id))
     
     if result['count'] > 0:
-        # Si hay camins usando esta localización, redirigir con error
-        # (en producción usaríamos flash messages)
+        # Si hi ha camins utilitzant aquesta localització, redirigir amb error
         return RedirectResponse(url="/localitzacions", status_code=status.HTTP_303_SEE_OTHER)
     
     db.execute_query("DELETE FROM localitzacions WHERE id = %s", (id,), fetch=False)
@@ -119,7 +117,7 @@ async def eliminar_localitzacio(id: int):
 
 @app.get("/camins", response_class=HTMLResponse)
 async def list_camins(request: Request):
-    """Lista todos los camins con sus localizaciones"""
+    """Llista tots els camins amb les seves localitzacions"""
     query = """
         SELECT 
             c.id,
@@ -141,7 +139,7 @@ async def list_camins(request: Request):
 
 @app.get("/camins/nou", response_class=HTMLResponse)
 async def nou_cami_form(request: Request):
-    """Formulario para crear nuevo camí"""
+    """Formulari per crear nou camí"""
     localitzacions = db.execute_query("SELECT id, nom FROM localitzacions ORDER BY nom")
     return templates.TemplateResponse(
         "cami_form.html", 
@@ -154,7 +152,7 @@ async def crear_cami(
     localitzacio1: int = Form(...),
     localitzacio2: int = Form(...)
 ):
-    """Crea un nuevo camí"""
+    """Crea un nou camí"""
     query = """
         INSERT INTO camins (nom, localitzacio1, localitzacio2) 
         VALUES (%s, %s, %s)
@@ -164,7 +162,7 @@ async def crear_cami(
 
 @app.get("/camins/{id}/editar", response_class=HTMLResponse)
 async def editar_cami_form(request: Request, id: int):
-    """Formulario para editar camí"""
+    """Formulari per editar camí"""
     cami = db.execute_single("SELECT * FROM camins WHERE id = %s", (id,))
     localitzacions = db.execute_query("SELECT id, nom FROM localitzacions ORDER BY nom")
     return templates.TemplateResponse(
@@ -179,7 +177,7 @@ async def actualitzar_cami(
     localitzacio1: int = Form(...),
     localitzacio2: int = Form(...)
 ):
-    """Actualiza un camí"""
+    """Actualitza un camí"""
     query = """
         UPDATE camins 
         SET nom = %s, localitzacio1 = %s, localitzacio2 = %s 
