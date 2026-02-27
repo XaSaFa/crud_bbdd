@@ -1,0 +1,60 @@
+{% extends "base.html" %}
+
+{% block title %}{% if cami %}Editar{% else %}Nou{% endif %} Camí{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <h2>{% if cami %}Editar Camí #{{ cami.id }}{% else %}Nou Camí{% endif %}</h2>
+</div>
+
+<div class="form-container">
+    <form method="post" action="{% if cami %}/camins/{{ cami.id }}/editar{% else %}/camins/nou{% endif %}">
+        <div class="form-group">
+            <label for="nom">Nom *</label>
+            <input type="text" id="nom" name="nom" required maxlength="50"
+                   value="{{ cami.nom if cami else '' }}"
+                   placeholder="Nom del camí">
+        </div>
+
+        <div class="form-group">
+            <label for="localitzacio1">Localització 1 *</label>
+            <select id="localitzacio1" name="localitzacio1" required>
+                <option value="">-- Selecciona una localització --</option>
+                {% for loc in localitzacions %}
+                <option value="{{ loc.id }}" 
+                        {% if cami and cami.localitzacio1 == loc.id %}selected{% endif %}>
+                    {{ loc.nom }} (ID: {{ loc.id }})
+                </option>
+                {% endfor %}
+            </select>
+        </div>
+
+        <div class="form-group">
+            <label for="localitzacio2">Localització 2 *</label>
+            <select id="localitzacio2" name="localitzacio2" required>
+                <option value="">-- Selecciona una localització --</option>
+                {% for loc in localitzacions %}
+                <option value="{{ loc.id }}" 
+                        {% if cami and cami.localitzacio2 == loc.id %}selected{% endif %}>
+                    {{ loc.nom }} (ID: {{ loc.id }})
+                </option>
+                {% endfor %}
+            </select>
+        </div>
+
+        {% if not localitzacions %}
+        <div class="alert alert-warning">
+            <strong>Atenció:</strong> No hi ha localitzacions disponibles. 
+            <a href="/localitzacions/nova">Crea una localització primer</a>.
+        </div>
+        {% endif %}
+
+        <div class="form-actions">
+            <button type="submit" class="btn btn-success" {% if not localitzacions %}disabled{% endif %}>
+                {% if cami %}Actualitzar{% else %}Crear{% endif %}
+            </button>
+            <a href="/camins" class="btn btn-secondary">Cancel·lar</a>
+        </div>
+    </form>
+</div>
+{% endblock %}

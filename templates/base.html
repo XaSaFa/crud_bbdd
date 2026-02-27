@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="ca">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Aventura CRUD{% endblock %}</title>
+    <link rel="stylesheet" href="/static/css/style.css">
+</head>
+<body>
+    <header>
+        <nav>
+            <div class="container">
+                <h1>Aventura CRUD</h1>
+                <ul>
+                    <li><a href="/">Inici</a></li>
+                    <li><a href="/localitzacions">Localitzacions</a></li>
+                    <li><a href="/camins">Camins</a></li>
+                </ul>
+            </div>
+        </nav>
+    </header>
+
+    <main class="container">
+        {% block content %}{% endblock %}
+    </main>
+
+    <footer>
+        <div class="container">
+            <p>&copy; 2024 Aventura - Sistema de Gestió</p>
+        </div>
+    </footer>
+</body>
+</html>

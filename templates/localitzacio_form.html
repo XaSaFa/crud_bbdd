@@ -1,0 +1,40 @@
+{% extends "base.html" %}
+
+{% block title %}{% if localitzacio %}Editar{% else %}Nova{% endif %} Localització{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <h2>{% if localitzacio %}Editar Localització #{{ localitzacio.id }}{% else %}Nova Localització{% endif %}</h2>
+</div>
+
+<div class="form-container">
+    <form method="post" action="{% if localitzacio %}/localitzacions/{{ localitzacio.id }}/editar{% else %}/localitzacions/nova{% endif %}">
+        <div class="form-group">
+            <label for="nom">Nom *</label>
+            <input type="text" id="nom" name="nom" required maxlength="100"
+                   value="{{ localitzacio.nom if localitzacio else '' }}"
+                   placeholder="Nom de la localització">
+        </div>
+
+        <div class="form-group">
+            <label for="descripcio">Descripció</label>
+            <textarea id="descripcio" name="descripcio" rows="5"
+                      placeholder="Descripció detallada de la localització">{{ localitzacio.descripcio if localitzacio else '' }}</textarea>
+        </div>
+
+        <div class="form-group">
+            <label for="imatge">Imatge (URL o ruta)</label>
+            <input type="text" id="imatge" name="imatge" maxlength="250"
+                   value="{{ localitzacio.imatge if localitzacio else '' }}"
+                   placeholder="URL o ruta de la imatge">
+        </div>
+
+        <div class="form-actions">
+            <button type="submit" class="btn btn-success">
+                {% if localitzacio %}Actualitzar{% else %}Crear{% endif %}
+            </button>
+            <a href="/localitzacions" class="btn btn-secondary">Cancel·lar</a>
+        </div>
+    </form>
+</div>
+{% endblock %}

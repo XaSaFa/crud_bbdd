@@ -1,0 +1,62 @@
+{% extends "base.html" %}
+
+{% block title %}Camins - Aventura CRUD{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <h2>Camins</h2>
+    <a href="/camins/nou" class="btn btn-success">+ Nou Camí</a>
+</div>
+
+{% if camins %}
+<table class="data-table">
+    <thead>
+        <tr>
+            <th>ID</th>
+            <th>Nom</th>
+            <th>Localització 1</th>
+            <th>Localització 2</th>
+            <th>Accions</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for cami in camins %}
+        <tr>
+            <td>{{ cami.id }}</td>
+            <td><strong>{{ cami.nom }}</strong></td>
+            <td>
+                {% if cami.nom_localitzacio1 %}
+                    <span class="badge">{{ cami.nom_localitzacio1 }}</span>
+                    <small>(ID: {{ cami.localitzacio1 }})</small>
+                {% else %}
+                    <em>Localització no trobada</em>
+                {% endif %}
+            </td>
+            <td>
+                {% if cami.nom_localitzacio2 %}
+                    <span class="badge">{{ cami.nom_localitzacio2 }}</span>
+                    <small>(ID: {{ cami.localitzacio2 }})</small>
+                {% else %}
+                    <em>Localització no trobada</em>
+                {% endif %}
+            </td>
+            <td class="actions">
+                <a href="/camins/{{ cami.id }}/editar" class="btn btn-small btn-warning">Editar</a>
+                <form method="post" action="/camins/{{ cami.id }}/eliminar" style="display: inline;">
+                    <button type="submit" class="btn btn-small btn-danger" 
+                            onclick="return confirm('Estàs segur que vols eliminar aquest camí?')">
+                        Eliminar
+                    </button>
+                </form>
+            </td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% else %}
+<div class="empty-state">
+    <p>No hi ha camins registrats.</p>
+    <a href="/camins/nou" class="btn btn-primary">Crear el primer camí</a>
+</div>
+{% endif %}
+{% endblock %}

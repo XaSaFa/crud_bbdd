@@ -1,0 +1,24 @@
+{% extends "base.html" %}
+
+{% block title %}Inici - Aventura CRUD{% endblock %}
+
+{% block content %}
+<div class="welcome">
+    <h2>Benvingut al Sistema de Gestió Aventura</h2>
+    <p>Gestiona les teves localitzacions i canins de manera senzilla.</p>
+    
+    <div class="menu-cards">
+        <div class="card">
+            <h3>Localitzacions</h3>
+            <p>Gestiona les localitzacions disponibles</p>
+            <a href="/localitzacions" class="btn btn-primary">Veure Localitzacions</a>
+        </div>
+        
+        <div class="card">
+            <h3>Camins</h3>
+            <p>Gestiona els registres de camins</p>
+            <a href="/camins" class="btn btn-primary">Veure Camins</a>
+        </div>
+    </div>
+</div>
+{% endblock %}

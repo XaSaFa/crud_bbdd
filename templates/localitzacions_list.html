@@ -1,0 +1,48 @@
+{% extends "base.html" %}
+
+{% block title %}Localitzacions - Aventura CRUD{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <h2>Localitzacions</h2>
+    <a href="/localitzacions/nova" class="btn btn-success">+ Nova Localització</a>
+</div>
+
+{% if localitzacions %}
+<table class="data-table">
+    <thead>
+        <tr>
+            <th>ID</th>
+            <th>Nom</th>
+            <th>Descripció</th>
+            <th>Imatge</th>
+            <th>Accions</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for loc in localitzacions %}
+        <tr>
+            <td>{{ loc.id }}</td>
+            <td><strong>{{ loc.nom }}</strong></td>
+            <td>{{ loc.descripcio[:100] if loc.descripcio else '-' }}</td>
+            <td>{{ loc.imatge if loc.imatge else '-' }}</td>
+            <td class="actions">
+                <a href="/localitzacions/{{ loc.id }}/editar" class="btn btn-small btn-warning">Editar</a>
+                <form method="post" action="/localitzacions/{{ loc.id }}/eliminar" style="display: inline;">
+                    <button type="submit" class="btn btn-small btn-danger" 
+                            onclick="return confirm('Estàs segur que vols eliminar aquesta localització?')">
+                        Eliminar
+                    </button>
+                </form>
+            </td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% else %}
+<div class="empty-state">
+    <p>No hi ha localitzacions registrades.</p>
+    <a href="/localitzacions/nova" class="btn btn-primary">Crear la primera localització</a>
+</div>
+{% endif %}
+{% endblock %}
