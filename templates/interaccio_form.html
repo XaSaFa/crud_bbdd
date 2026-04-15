@@ -1,0 +1,162 @@
+{% extends "base.html" %}
+{% block title %}{% if interaccio %}Editar{% else %}Nova{% endif %} Interacció{% endblock %}
+{% block content %}
+<div class="page-header">
+    <h2>{% if interaccio %}Editar Interacció #{{ interaccio.id }}{% else %}Nova Interacció{% endif %}</h2>
+</div>
+<div class="form-container" style="max-width:700px;">
+    <p style="color:#666; margin-bottom:1.5rem;">
+        Defineix què passa quan el jugador usa un objecte de l'inventari sobre un element del món.
+    </p>
+    <form method="post" action="{% if interaccio %}/interaccions/{{ interaccio.id }}/editar{% else %}/interaccions/nova{% endif %}">
+
+        <div class="form-group">
+            <label for="objecte_id">Objecte de l'inventari *</label>
+            <select id="objecte_id" name="objecte_id" required>
+                <option value="">-- Selecciona l'objecte que s'usa --</option>
+                {% for obj in objectes %}
+                <option value="{{ obj.id }}"
+                        {% if interaccio and interaccio.objecte_id == obj.id %}selected{% endif %}>
+                    {{ obj.nom }} (ID: {{ obj.id }})
+                </option>
+                {% endfor %}
+            </select>
+        </div>
+
+        <div class="form-group">
+            <label for="target_tipus">S'usa sobre *</label>
+            <select id="target_tipus" name="target_tipus" required onchange="updateTargetOptions()">
+                <option value="">-- Selecciona el tipus --</option>
+                <option value="objecte" {% if interaccio and interaccio.target_tipus == 'objecte' %}selected{% endif %}>
+                    🎭 Objecte decorat de la sala
+                </option>
+                <option value="cami" {% if interaccio and interaccio.target_tipus == 'cami' %}selected{% endif %}>
+                    🚪 Camí (porta tancada)
+                </option>
+            </select>
+        </div>
+
+        <div class="form-group">
+            <label for="target_id">Element concret *</label>
+            <select id="target_id" name="target_id" required>
+                <option value="">-- Primer selecciona el tipus --</option>
+                {% if interaccio %}
+                    {% if interaccio.target_tipus == 'objecte' %}
+                        {% for obj in objectes %}
+                        <option value="{{ obj.id }}"
+                                {% if interaccio.target_id == obj.id %}selected{% endif %}>
+                            {{ obj.nom }} (ID: {{ obj.id }})
+                        </option>
+                        {% endfor %}
+                    {% elif interaccio.target_tipus == 'cami' %}
+                        {% for c in camins %}
+                        <option value="{{ c.id }}"
+                                {% if interaccio.target_id == c.id %}selected{% endif %}>
+                            {{ c.nom1 }} / {{ c.nom2 }} (ID: {{ c.id }})
+                        </option>
+                        {% endfor %}
+                    {% endif %}
+                {% endif %}
+            </select>
+        </div>
+
+        <hr style="margin: 1.5rem 0; border-color: #e0e0e0;">
+
+        <div class="form-group">
+            <label for="resultat_tipus">Tipus de resultat *</label>
+            <select id="resultat_tipus" name="resultat_tipus" required onchange="updateResultatFields()">
+                <option value="">-- Selecciona el resultat --</option>
+                <option value="obrir_cami"     {% if interaccio and interaccio.resultat_tipus == 'obrir_cami' %}selected{% endif %}>🔓 Obre el camí</option>
+                <option value="crear_objecte"  {% if interaccio and interaccio.resultat_tipus == 'crear_objecte' %}selected{% endif %}>✨ Crea un objecte nou</option>
+                <option value="missatge"       {% if interaccio and interaccio.resultat_tipus == 'missatge' %}selected{% endif %}>💬 Mostra un missatge</option>
+            </select>
+        </div>
+
+        <div id="camp-resultat-objecte" style="display:{% if interaccio and interaccio.resultat_tipus == 'crear_objecte' %}block{% else %}none{% endif %};">
+            <div class="form-group">
+                <label for="resultat_id">Objecte que es crea</label>
+                <select id="resultat_id" name="resultat_id">
+                    <option value="">-- Cap --</option>
+                    {% for obj in objectes %}
+                    <option value="{{ obj.id }}"
+                            {% if interaccio and interaccio.resultat_id == obj.id %}selected{% endif %}>
+                        {{ obj.nom }} (ID: {{ obj.id }})
+                    </option>
+                    {% endfor %}
+                </select>
+            </div>
+        </div>
+
+        <div id="camp-resultat-missatge" style="display:{% if interaccio and interaccio.resultat_tipus == 'missatge' %}block{% else %}none{% endif %};">
+            <div class="form-group">
+                <label for="resultat_missatge">Text del missatge</label>
+                <input type="text" id="resultat_missatge" name="resultat_missatge" maxlength="250"
+                       value="{{ interaccio.resultat_missatge if interaccio else '' }}"
+                       placeholder="Ex: La porta no s'obre amb això...">
+            </div>
+        </div>
+
+        <div class="form-group form-group-inline">
+            <label>
+                <input type="checkbox" name="consumeix" value="on"
+                       {% if not interaccio or interaccio.consumeix %}checked{% endif %}>
+                L'objecte es consumeix (desapareix de l'inventari després d'usar-lo)
+            </label>
+        </div>
+
+        <div class="form-actions">
+            <button type="submit" class="btn btn-success">
+                {% if interaccio %}Actualitzar{% else %}Crear{% endif %}
+            </button>
+            <a href="/interaccions" class="btn btn-secondary">Cancel·lar</a>
+        </div>
+    </form>
+</div>
+
+<style>
+.form-group-inline label { display:flex; align-items:center; gap:0.5rem; font-weight:normal; cursor:pointer; }
+.form-group-inline input[type=checkbox] { width:auto; }
+</style>
+
+<script>
+const objectes = [
+    {% for obj in objectes %}
+    { id: {{ obj.id }}, nom: "{{ obj.nom }}" },
+    {% endfor %}
+];
+const camins = [
+    {% for c in camins %}
+    { id: {{ c.id }}, nom: "{{ c.nom1 }} / {{ c.nom2 }}" },
+    {% endfor %}
+];
+
+function updateTargetOptions() {
+    const tipus = document.getElementById('target_tipus').value;
+    const select = document.getElementById('target_id');
+    const currentVal = select.value;
+    select.innerHTML = '<option value="">-- Selecciona --</option>';
+    const llista = tipus === 'cami' ? camins : objectes;
+    llista.forEach(item => {
+        const opt = document.createElement('option');
+        opt.value = item.id;
+        opt.textContent = item.nom + ' (ID: ' + item.id + ')';
+        if (item.id == currentVal) opt.selected = true;
+        select.appendChild(opt);
+    });
+}
+
+function updateResultatFields() {
+    const tipus = document.getElementById('resultat_tipus').value;
+    document.getElementById('camp-resultat-objecte').style.display =
+        tipus === 'crear_objecte' ? 'block' : 'none';
+    document.getElementById('camp-resultat-missatge').style.display =
+        tipus === 'missatge' ? 'block' : 'none';
+}
+
+// Inicialitza si estem editant
+window.addEventListener('DOMContentLoaded', () => {
+    const tipus = document.getElementById('target_tipus').value;
+    if (tipus) updateTargetOptions();
+});
+</script>
+{% endblock %}

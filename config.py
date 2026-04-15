@@ -1,4 +1,4 @@
-# Configuració de la base de dades
+# Configuración de la base de datos
 DB_CONFIG = {
     'host': 'localhost',
     'port': 3306,

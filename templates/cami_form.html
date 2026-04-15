@@ -1,27 +1,18 @@
 {% extends "base.html" %}
-
 {% block title %}{% if cami %}Editar{% else %}Nou{% endif %} Camí{% endblock %}
-
 {% block content %}
 <div class="page-header">
     <h2>{% if cami %}Editar Camí #{{ cami.id }}{% else %}Nou Camí{% endif %}</h2>
 </div>
-
 <div class="form-container">
     <form method="post" action="{% if cami %}/camins/{{ cami.id }}/editar{% else %}/camins/nou{% endif %}">
-        <div class="form-group">
-            <label for="nom">Nom *</label>
-            <input type="text" id="nom" name="nom" required maxlength="50"
-                   value="{{ cami.nom if cami else '' }}"
-                   placeholder="Nom del camí">
-        </div>
 
         <div class="form-group">
             <label for="localitzacio1">Localització 1 *</label>
             <select id="localitzacio1" name="localitzacio1" required>
                 <option value="">-- Selecciona una localització --</option>
                 {% for loc in localitzacions %}
-                <option value="{{ loc.id }}" 
+                <option value="{{ loc.id }}"
                         {% if cami and cami.localitzacio1 == loc.id %}selected{% endif %}>
                     {{ loc.nom }} (ID: {{ loc.id }})
                 </option>
@@ -30,11 +21,18 @@
         </div>
 
         <div class="form-group">
+            <label for="nom1">Nom del camí des de Localització 1 *</label>
+            <input type="text" id="nom1" name="nom1" required maxlength="50"
+                   value="{{ cami.nom1 if cami else '' }}"
+                   placeholder="Ex: Porta del nord, Escala baixant...">
+        </div>
+
+        <div class="form-group">
             <label for="localitzacio2">Localització 2 *</label>
             <select id="localitzacio2" name="localitzacio2" required>
                 <option value="">-- Selecciona una localització --</option>
                 {% for loc in localitzacions %}
-                <option value="{{ loc.id }}" 
+                <option value="{{ loc.id }}"
                         {% if cami and cami.localitzacio2 == loc.id %}selected{% endif %}>
                     {{ loc.nom }} (ID: {{ loc.id }})
                 </option>
@@ -42,9 +40,24 @@
             </select>
         </div>
 
+        <div class="form-group">
+            <label for="nom2">Nom del camí des de Localització 2 *</label>
+            <input type="text" id="nom2" name="nom2" required maxlength="50"
+                   value="{{ cami.nom2 if cami else '' }}"
+                   placeholder="Ex: Porta del sud, Escala pujant...">
+        </div>
+
+        <div class="form-group form-group-inline">
+            <label>
+                <input type="checkbox" name="tancat" value="on"
+                       {% if cami and cami.tancat %}checked{% endif %}>
+                Camí tancat inicialment (requereix objecte per obrir-lo)
+            </label>
+        </div>
+
         {% if not localitzacions %}
         <div class="alert alert-warning">
-            <strong>Atenció:</strong> No hi ha localitzacions disponibles. 
+            <strong>Atenció:</strong> No hi ha localitzacions disponibles.
             <a href="/localitzacions/nova">Crea una localització primer</a>.
         </div>
         {% endif %}

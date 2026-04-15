@@ -2,7 +2,7 @@ import pymysql
 from config import DB_CONFIG
 
 def get_db_connection():
-    """Crea i retorna una conexió a la base de dades"""
+    """Crea y retorna una conexión a la base de datos"""
     return pymysql.connect(
         host=DB_CONFIG['host'],
         port=DB_CONFIG['port'],
@@ -14,7 +14,7 @@ def get_db_connection():
     )
 
 def execute_query(query, params=None, fetch=True):
-    """Executa una query i retorna els resultats"""
+    """Ejecuta una query y retorna los resultados"""
     conn = get_db_connection()
     try:
         with conn.cursor() as cursor:
@@ -28,7 +28,7 @@ def execute_query(query, params=None, fetch=True):
         conn.close()
 
 def execute_single(query, params=None):
-    """Executa una query i retorna un únic resultat"""
+    """Ejecuta una query y retorna un solo resultado"""
     conn = get_db_connection()
     try:
         with conn.cursor() as cursor:

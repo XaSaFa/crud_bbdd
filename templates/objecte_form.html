@@ -1,0 +1,149 @@
+{% extends "base.html" %}
+{% block title %}{% if objecte %}Editar{% else %}Nou{% endif %} Objecte{% endblock %}
+{% block content %}
+<div class="page-header">
+    <h2>{% if objecte %}Editar Objecte #{{ objecte.id }}{% else %}Nou Objecte{% endif %}</h2>
+</div>
+<div class="form-container" style="max-width: 700px;">
+    <form method="post" action="{% if objecte %}/objectes/{{ objecte.id }}/editar{% else %}/objectes/nou{% endif %}">
+
+        <div class="form-group">
+            <label for="nom">Nom *</label>
+            <input type="text" id="nom" name="nom" required maxlength="100"
+                   value="{{ objecte.nom if objecte else '' }}"
+                   placeholder="Nom de l'objecte">
+        </div>
+
+        <div class="form-group">
+            <label for="descripcio">Descripció</label>
+            <textarea id="descripcio" name="descripcio" rows="3"
+                      placeholder="Descripció que veurà el jugador en examinar l'objecte">{{ objecte.descripcio if objecte else '' }}</textarea>
+        </div>
+
+        <div class="form-group">
+            <label for="imatge">Ruta de la imatge</label>
+            <input type="text" id="imatge" name="imatge" maxlength="250"
+                   value="{{ objecte.imatge if objecte else '' }}"
+                   placeholder="Ex: /static/img/espasa.png">
+        </div>
+
+        <div class="form-group form-group-inline">
+            <label>
+                <input type="checkbox" name="agafable" value="on"
+                       {% if not objecte or objecte.agafable %}checked{% endif %}>
+                Agafable (el jugador el pot recollir a l'inventari)
+            </label>
+        </div>
+
+        <div class="form-group">
+            <label for="usos">Nombre d'usos</label>
+            <input type="number" id="usos" name="usos" min="-1"
+                   value="{{ objecte.usos if objecte else -1 }}">
+            <small style="color:#666;">-1 = usos il·limitats &nbsp;|&nbsp; 1 = desapareix després d'usar-lo</small>
+        </div>
+
+        <hr style="margin: 1.5rem 0; border-color: #e0e0e0;">
+
+        <div class="form-group">
+            <label for="localitzacio_id">Ubicació inicial</label>
+            <select id="localitzacio_id" name="localitzacio_id" onchange="togglePosicio(this.value)">
+                <option value="">-- Inventari (sense localització) --</option>
+                {% for loc in localitzacions %}
+                <option value="{{ loc.id }}"
+                        {% if objecte and objecte.localitzacio_id == loc.id %}selected{% endif %}>
+                    {{ loc.nom }} (ID: {{ loc.id }})
+                </option>
+                {% endfor %}
+            </select>
+            <small style="color:#666;">Deixa buit si l'objecte comença a l'inventari del jugador.</small>
+        </div>
+
+        <div id="seccio-posicio" style="display: {% if objecte and objecte.localitzacio_id %}block{% else %}none{% endif %};">
+            <div class="form-group">
+                <label>Posició sobre la imatge de la sala</label>
+                <small style="color:#666; display:block; margin-bottom:0.5rem;">
+                    Clica sobre el requadre per posicionar l'objecte (valors en percentatge).
+                </small>
+                <div class="posicio-grid">
+                    <div class="posicio-inputs">
+                        <div class="form-group">
+                            <label for="pos_x">X (%)</label>
+                            <input type="number" id="pos_x" name="pos_x" min="0" max="100" step="0.1"
+                                   value="{{ objecte.pos_x if objecte else 50 }}">
+                        </div>
+                        <div class="form-group">
+                            <label for="pos_y">Y (%)</label>
+                            <input type="number" id="pos_y" name="pos_y" min="0" max="100" step="0.1"
+                                   value="{{ objecte.pos_y if objecte else 50 }}">
+                        </div>
+                    </div>
+                    <div class="posicio-preview-wrap">
+                        <div id="posicio-preview" class="posicio-preview"
+                             onclick="setPosPer(event)" title="Clica per posicionar">
+                            <div id="posicio-marker" class="posicio-marker"
+                                 style="left:{{ objecte.pos_x if objecte else 50 }}%;
+                                        top:{{ objecte.pos_y if objecte else 50 }}%;">
+                            </div>
+                            <span class="posicio-hint">Clica per posicionar</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="form-actions">
+            <button type="submit" class="btn btn-success">
+                {% if objecte %}Actualitzar{% else %}Crear{% endif %}
+            </button>
+            <a href="/objectes" class="btn btn-secondary">Cancel·lar</a>
+        </div>
+    </form>
+</div>
+
+<style>
+.form-group-inline label { display: flex; align-items: center; gap: 0.5rem; font-weight: normal; cursor: pointer; }
+.form-group-inline input[type=checkbox] { width: auto; }
+.posicio-grid { display: flex; gap: 2rem; align-items: flex-start; margin-top: 0.5rem; }
+.posicio-inputs { display: flex; flex-direction: column; gap: 0.5rem; min-width: 120px; }
+.posicio-preview-wrap { flex: 1; }
+.posicio-preview {
+    position: relative; width: 100%; max-width: 400px; height: 200px;
+    background: #e8e8e8; border: 2px dashed #3498db; border-radius: 6px;
+    cursor: crosshair; overflow: hidden;
+}
+.posicio-marker {
+    position: absolute; width: 16px; height: 16px;
+    background: #e74c3c; border: 2px solid #fff; border-radius: 50%;
+    transform: translate(-50%, -50%); pointer-events: none;
+    box-shadow: 0 0 6px rgba(231,76,60,0.6);
+}
+.posicio-hint {
+    position: absolute; bottom: 6px; right: 8px;
+    font-size: 0.75rem; color: #999; pointer-events: none;
+}
+</style>
+
+<script>
+function togglePosicio(val) {
+    document.getElementById('seccio-posicio').style.display = val ? 'block' : 'none';
+}
+function setPosPer(event) {
+    const preview = document.getElementById('posicio-preview');
+    const rect = preview.getBoundingClientRect();
+    const x = ((event.clientX - rect.left) / rect.width * 100).toFixed(1);
+    const y = ((event.clientY - rect.top)  / rect.height * 100).toFixed(1);
+    document.getElementById('pos_x').value = x;
+    document.getElementById('pos_y').value = y;
+    syncMarker();
+}
+function syncMarker() {
+    const x = document.getElementById('pos_x').value;
+    const y = document.getElementById('pos_y').value;
+    const m = document.getElementById('posicio-marker');
+    m.style.left = x + '%';
+    m.style.top  = y + '%';
+}
+document.getElementById('pos_x').addEventListener('input', syncMarker);
+document.getElementById('pos_y').addEventListener('input', syncMarker);
+</script>
+{% endblock %}

@@ -1,0 +1,69 @@
+{% extends "base.html" %}
+{% block title %}Interaccions - Aventura CRUD{% endblock %}
+{% block content %}
+<div class="page-header">
+    <h2>Interaccions</h2>
+    <a href="/interaccions/nova" class="btn btn-success">+ Nova Interacció</a>
+</div>
+{% if interaccions %}
+<table class="data-table">
+    <thead>
+        <tr>
+            <th>ID</th>
+            <th>Objecte (inventari)</th>
+            <th>S'usa sobre</th>
+            <th>Target</th>
+            <th>Resultat</th>
+            <th>Consumeix</th>
+            <th>Accions</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for i in interaccions %}
+        <tr>
+            <td>{{ i.id }}</td>
+            <td><span class="badge">{{ i.nom_objecte }}</span></td>
+            <td>
+                {% if i.target_tipus == 'cami' %}
+                    🚪 Camí
+                {% else %}
+                    🎭 Objecte decorat
+                {% endif %}
+            </td>
+            <td><strong>{{ i.nom_target or '—' }}</strong></td>
+            <td>
+                {% if i.resultat_tipus == 'obrir_cami' %}
+                    🔓 Obre camí
+                {% elif i.resultat_tipus == 'crear_objecte' %}
+                    ✨ Crea: <span class="badge badge-obert">{{ i.nom_resultat or '?' }}</span>
+                {% elif i.resultat_tipus == 'missatge' %}
+                    💬 "{{ i.resultat_missatge }}"
+                {% endif %}
+            </td>
+            <td>
+                {% if i.consumeix %}
+                    <span class="badge badge-tancat">Sí</span>
+                {% else %}
+                    <span class="badge">No</span>
+                {% endif %}
+            </td>
+            <td class="actions">
+                <a href="/interaccions/{{ i.id }}/editar" class="btn btn-small btn-warning">Editar</a>
+                <form method="post" action="/interaccions/{{ i.id }}/eliminar" style="display:inline;">
+                    <button type="submit" class="btn btn-small btn-danger"
+                            onclick="return confirm('Eliminar aquesta interacció?')">
+                        Eliminar
+                    </button>
+                </form>
+            </td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% else %}
+<div class="empty-state">
+    <p>No hi ha interaccions registrades.</p>
+    <a href="/interaccions/nova" class="btn btn-primary">Crear la primera interacció</a>
+</div>
+{% endif %}
+{% endblock %}

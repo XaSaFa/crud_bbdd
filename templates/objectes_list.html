@@ -1,0 +1,82 @@
+{% extends "base.html" %}
+{% block title %}Objectes - Aventura CRUD{% endblock %}
+{% block content %}
+<div class="page-header">
+    <h2>Objectes</h2>
+    <a href="/objectes/nou" class="btn btn-success">+ Nou Objecte</a>
+</div>
+{% if objectes %}
+<table class="data-table">
+    <thead>
+        <tr>
+            <th>ID</th>
+            <th>Imatge</th>
+            <th>Nom</th>
+            <th>Agafable</th>
+            <th>Usos</th>
+            <th>Ubicació</th>
+            <th>Posició</th>
+            <th>Accions</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for obj in objectes %}
+        <tr>
+            <td>{{ obj.id }}</td>
+            <td>
+                {% if obj.imatge %}
+                    <img src="{{ obj.imatge }}" alt="{{ obj.nom }}"
+                         style="height:40px; width:40px; object-fit:cover; border-radius:4px;">
+                {% else %}
+                    <span style="color:#aaa;">—</span>
+                {% endif %}
+            </td>
+            <td><strong>{{ obj.nom }}</strong></td>
+            <td>
+                {% if obj.agafable %}
+                    <span class="badge badge-obert">✔ Sí</span>
+                {% else %}
+                    <span class="badge badge-tancat">✖ Decorat</span>
+                {% endif %}
+            </td>
+            <td>
+                {% if obj.usos == -1 %}
+                    ∞
+                {% else %}
+                    {{ obj.usos }}
+                {% endif %}
+            </td>
+            <td>
+                {% if obj.nom_localitzacio %}
+                    <span class="badge">{{ obj.nom_localitzacio }}</span>
+                {% else %}
+                    <span class="badge badge-inventory">Inventari</span>
+                {% endif %}
+            </td>
+            <td>
+                {% if obj.localitzacio_id %}
+                    {{ obj.pos_x }}%, {{ obj.pos_y }}%
+                {% else %}
+                    —
+                {% endif %}
+            </td>
+            <td class="actions">
+                <a href="/objectes/{{ obj.id }}/editar" class="btn btn-small btn-warning">Editar</a>
+                <form method="post" action="/objectes/{{ obj.id }}/eliminar" style="display: inline;">
+                    <button type="submit" class="btn btn-small btn-danger"
+                            onclick="return confirm('Estàs segur que vols eliminar aquest objecte?')">
+                        Eliminar
+                    </button>
+                </form>
+            </td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% else %}
+<div class="empty-state">
+    <p>No hi ha objectes registrats.</p>
+    <a href="/objectes/nou" class="btn btn-primary">Crear el primer objecte</a>
+</div>
+{% endif %}
+{% endblock %}

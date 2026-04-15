@@ -1,0 +1,65 @@
+{% extends "base.html" %}
+{% block title %}{% if combinacio %}Editar{% else %}Nova{% endif %} Combinació{% endblock %}
+{% block content %}
+<div class="page-header">
+    <h2>{% if combinacio %}Editar Combinació #{{ combinacio.id }}{% else %}Nova Combinació{% endif %}</h2>
+</div>
+<div class="form-container">
+    <p style="color:#666; margin-bottom:1.5rem;">
+        Defineix quins dos objectes es combinen i quin objecte nou es crea com a resultat.
+        Els dos objectes originals desapareixeran de l'inventari.
+    </p>
+    <form method="post" action="{% if combinacio %}/combinacions/{{ combinacio.id }}/editar{% else %}/combinacions/nova{% endif %}">
+
+        <div class="form-group">
+            <label for="objecte_a">Objecte A *</label>
+            <select id="objecte_a" name="objecte_a" required>
+                <option value="">-- Selecciona un objecte --</option>
+                {% for obj in objectes %}
+                <option value="{{ obj.id }}"
+                        {% if combinacio and combinacio.objecte_a == obj.id %}selected{% endif %}>
+                    {{ obj.nom }} (ID: {{ obj.id }})
+                </option>
+                {% endfor %}
+            </select>
+        </div>
+
+        <div class="form-group">
+            <label for="objecte_b">Objecte B *</label>
+            <select id="objecte_b" name="objecte_b" required>
+                <option value="">-- Selecciona un objecte --</option>
+                {% for obj in objectes %}
+                <option value="{{ obj.id }}"
+                        {% if combinacio and combinacio.objecte_b == obj.id %}selected{% endif %}>
+                    {{ obj.nom }} (ID: {{ obj.id }})
+                </option>
+                {% endfor %}
+            </select>
+        </div>
+
+        <div class="form-group">
+            <label for="resultat_id">Objecte resultat *</label>
+            <select id="resultat_id" name="resultat_id" required>
+                <option value="">-- Selecciona el resultat --</option>
+                {% for obj in objectes %}
+                <option value="{{ obj.id }}"
+                        {% if combinacio and combinacio.resultat_id == obj.id %}selected{% endif %}>
+                    {{ obj.nom }} (ID: {{ obj.id }})
+                </option>
+                {% endfor %}
+            </select>
+            <small style="color:#666;">
+                L'objecte resultat ha d'existir prèviament a la taula d'objectes.
+                Si no existeix, <a href="/objectes/nou">crea'l primer</a>.
+            </small>
+        </div>
+
+        <div class="form-actions">
+            <button type="submit" class="btn btn-success">
+                {% if combinacio %}Actualitzar{% else %}Crear{% endif %}
+            </button>
+            <a href="/combinacions" class="btn btn-secondary">Cancel·lar</a>
+        </div>
+    </form>
+</div>
+{% endblock %}

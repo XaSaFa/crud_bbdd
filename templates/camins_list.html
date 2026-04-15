@@ -1,21 +1,20 @@
 {% extends "base.html" %}
-
 {% block title %}Camins - Aventura CRUD{% endblock %}
-
 {% block content %}
 <div class="page-header">
     <h2>Camins</h2>
     <a href="/camins/nou" class="btn btn-success">+ Nou Camí</a>
 </div>
-
 {% if camins %}
 <table class="data-table">
     <thead>
         <tr>
             <th>ID</th>
-            <th>Nom</th>
             <th>Localització 1</th>
+            <th>Nom 1</th>
             <th>Localització 2</th>
+            <th>Nom 2</th>
+            <th>Estat</th>
             <th>Accions</th>
         </tr>
     </thead>
@@ -23,27 +22,33 @@
         {% for cami in camins %}
         <tr>
             <td>{{ cami.id }}</td>
-            <td><strong>{{ cami.nom }}</strong></td>
             <td>
                 {% if cami.nom_localitzacio1 %}
                     <span class="badge">{{ cami.nom_localitzacio1 }}</span>
-                    <small>(ID: {{ cami.localitzacio1 }})</small>
                 {% else %}
-                    <em>Localització no trobada</em>
+                    <em>No trobada</em>
                 {% endif %}
             </td>
+            <td><strong>{{ cami.nom1 }}</strong></td>
             <td>
                 {% if cami.nom_localitzacio2 %}
                     <span class="badge">{{ cami.nom_localitzacio2 }}</span>
-                    <small>(ID: {{ cami.localitzacio2 }})</small>
                 {% else %}
-                    <em>Localització no trobada</em>
+                    <em>No trobada</em>
+                {% endif %}
+            </td>
+            <td><strong>{{ cami.nom2 }}</strong></td>
+            <td>
+                {% if cami.tancat %}
+                    <span class="badge badge-tancat">🔒 Tancat</span>
+                {% else %}
+                    <span class="badge badge-obert">🔓 Obert</span>
                 {% endif %}
             </td>
             <td class="actions">
                 <a href="/camins/{{ cami.id }}/editar" class="btn btn-small btn-warning">Editar</a>
                 <form method="post" action="/camins/{{ cami.id }}/eliminar" style="display: inline;">
-                    <button type="submit" class="btn btn-small btn-danger" 
+                    <button type="submit" class="btn btn-small btn-danger"
                             onclick="return confirm('Estàs segur que vols eliminar aquest camí?')">
                         Eliminar
                     </button>

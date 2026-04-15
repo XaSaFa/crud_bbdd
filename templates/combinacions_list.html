@@ -1,0 +1,49 @@
+{% extends "base.html" %}
+{% block title %}Combinacions - Aventura CRUD{% endblock %}
+{% block content %}
+<div class="page-header">
+    <h2>Combinacions</h2>
+    <a href="/combinacions/nova" class="btn btn-success">+ Nova Combinació</a>
+</div>
+{% if combinacions %}
+<table class="data-table">
+    <thead>
+        <tr>
+            <th>ID</th>
+            <th>Objecte A</th>
+            <th></th>
+            <th>Objecte B</th>
+            <th></th>
+            <th>Resultat</th>
+            <th>Accions</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for c in combinacions %}
+        <tr>
+            <td>{{ c.id }}</td>
+            <td><span class="badge">{{ c.nom_a }}</span></td>
+            <td style="text-align:center; font-size:1.2rem;">+</td>
+            <td><span class="badge">{{ c.nom_b }}</span></td>
+            <td style="text-align:center; font-size:1.2rem;">→</td>
+            <td><span class="badge badge-obert">{{ c.nom_resultat }}</span></td>
+            <td class="actions">
+                <a href="/combinacions/{{ c.id }}/editar" class="btn btn-small btn-warning">Editar</a>
+                <form method="post" action="/combinacions/{{ c.id }}/eliminar" style="display:inline;">
+                    <button type="submit" class="btn btn-small btn-danger"
+                            onclick="return confirm('Eliminar aquesta combinació?')">
+                        Eliminar
+                    </button>
+                </form>
+            </td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% else %}
+<div class="empty-state">
+    <p>No hi ha combinacions registrades.</p>
+    <a href="/combinacions/nova" class="btn btn-primary">Crear la primera combinació</a>
+</div>
+{% endif %}
+{% endblock %}
