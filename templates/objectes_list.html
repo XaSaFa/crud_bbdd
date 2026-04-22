@@ -16,6 +16,7 @@
             <th>Usos</th>
             <th>Ubicació</th>
             <th>Posició</th>
+            <th>Mida (%)</th>
             <th>Accions</th>
         </tr>
     </thead>
@@ -60,6 +61,7 @@
                     —
                 {% endif %}
             </td>
+            <td>{{ obj.mida }}%</td>
             <td class="actions">
                 <a href="/objectes/{{ obj.id }}/editar" class="btn btn-small btn-warning">Editar</a>
                 <form method="post" action="/objectes/{{ obj.id }}/eliminar" style="display: inline;">

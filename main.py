@@ -197,15 +197,16 @@ async def crear_objecte(
     pos_x: float = Form(50.0),
     pos_y: float = Form(50.0),
     agafable: str = Form("off"),
-    usos: int = Form(-1)
+    usos: int = Form(-1),
+    mida: float = Form(100.0)
 ):
     query = """
-        INSERT INTO objectes (nom, descripcio, imatge, localitzacio_id, pos_x, pos_y, agafable, usos)
-        VALUES (%s, %s, %s, %s, %s, %s, %s, %s)
+        INSERT INTO objectes (nom, descripcio, imatge, localitzacio_id, pos_x, pos_y, agafable, usos, mida)
+        VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s)
     """
     descripcio_bytes = descripcio.encode('utf-8') if descripcio else b''
     loc_id = int(localitzacio_id) if localitzacio_id else None
-    db.execute_query(query, (nom, descripcio_bytes, imatge, loc_id, pos_x, pos_y, agafable == "on", usos), fetch=False)
+    db.execute_query(query, (nom, descripcio_bytes, imatge, loc_id, pos_x, pos_y, agafable == "on", usos, mida), fetch=False)
     return RedirectResponse(url="/objectes", status_code=status.HTTP_303_SEE_OTHER)
 
 @app.get("/objectes/{id}/editar", response_class=HTMLResponse)
@@ -227,17 +228,18 @@ async def actualitzar_objecte(
     pos_x: float = Form(50.0),
     pos_y: float = Form(50.0),
     agafable: str = Form("off"),
-    usos: int = Form(-1)
+    usos: int = Form(-1),
+    mida: float = Form(100.0)
 ):
     query = """
         UPDATE objectes
         SET nom=%s, descripcio=%s, imatge=%s, localitzacio_id=%s,
-            pos_x=%s, pos_y=%s, agafable=%s, usos=%s
+            pos_x=%s, pos_y=%s, agafable=%s, usos=%s, mida=%s
         WHERE id=%s
     """
     descripcio_bytes = descripcio.encode('utf-8') if descripcio else b''
     loc_id = int(localitzacio_id) if localitzacio_id else None
-    db.execute_query(query, (nom, descripcio_bytes, imatge, loc_id, pos_x, pos_y, agafable == "on", usos, id), fetch=False)
+    db.execute_query(query, (nom, descripcio_bytes, imatge, loc_id, pos_x, pos_y, agafable == "on", usos, mida, id), fetch=False)
     return RedirectResponse(url="/objectes", status_code=status.HTTP_303_SEE_OTHER)
 
 @app.post("/objectes/{id}/eliminar")
